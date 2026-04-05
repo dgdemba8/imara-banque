@@ -4,23 +4,18 @@
 
 ---
 
-## Utilisation :
-Configuration locale; modifier settings.py avec vos propres identifiants
-saisir comme utilisateur surface et comme mot de passe 390453.
-
-
-
 ## Pour lancer le projet en local
 
 ### Prérequis
 - Python 3.14
 - MySQL 8
-- Redis (optionnel — pour Celery)
+- Redis (optionnel, pour Celery)
 
 ### Installation
 
+```bash
 # 1. Cloner le repo
-git clone https://github.com/VOTRE_USERNAME/imara-banque.git
+git clone https://github.com/dgdemba8/imara-banque.git
 cd imara-banque
 
 # 2. Installer les dépendances
@@ -31,8 +26,8 @@ mysql -u root -p
 CREATE DATABASE exam_banque CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 exit;
 
-# 4. Configurer settings.py
-# Modifier config/settings.py avec vos identifiants MySQL
+# 4. Copier .env.example → .env et remplir vos valeurs
+cp .env.example .env
 
 # 5. Appliquer les migrations
 python manage.py migrate
@@ -43,14 +38,18 @@ python manage.py createsuperuser
 # 7. Lancer le serveur
 python manage.py runserver
 
+# 8. (Optionnel) Lancer Celery pour les virements récurrents
+celery -A config worker --loglevel=info
+celery -A config beat --loglevel=info
+```
 
-
+---
 
 ## À propos du projet
 
 Imara Banque est une plateforme bancaire web développée avec Django 6, MySQL et Celery. Elle ambitionne d'offrir les fonctionnalités essentielles d'une banque en ligne moderne : gestion de comptes, virements, relevés PDF, journal de connexions et bien plus.
 
-Le projet a été conçu avec une attention particulière portée à deux choses : **la sécurité** et **l'expérience utilisateur**. L'interface est sobre, élégante, cohérente du premier au dernier pixel ( aux couleurs ardoise et champagne qui font l'identité visuelle d'Imara Banque ).
+Le projet a été conçu avec une attention particulière portée à deux choses : **la sécurité** et **l'expérience utilisateur**. L'interface est sobre, élégante, cohérente du premier au dernier pixel (aux couleurs ardoise et champagne qui font l'identité visuelle d'Imara Banque).
 
 ---
 
@@ -74,7 +73,7 @@ L'authentification se déroule en **deux étapes distinctes**, à la manière de
 
 - Connexion en deux étapes (username → password)
 - Affichage/masquage du mot de passe
-- Trois tentatives de connexion possibles. Si mot de passe toujours incorrect, l'utilisateur reste bloqué pendant quinze (15) minutes au bout desquelles il pourra retenter une connexion.
+- Trois tentatives de connexion possibles. Si le mot de passe est toujours incorrect, l'utilisateur est bloqué pendant quinze (15) minutes, au bout desquelles il pourra retenter une connexion.
 - Déconnexion manuelle sécurisée
 - **Déconnexion automatique après 30 minutes d'inactivité**, avec un popup de compte à rebours (5 minutes d'avertissement avant expiration)
 - Le bouton "Je suis toujours là" prolonge la session via AJAX sans rechargement de page
@@ -95,7 +94,7 @@ Chaque utilisateur peut avoir plusieurs comptes (courant, épargne). La page "Me
 - **Email de confirmation automatique** pour tout virement dépassant 200 000 FCFA
 
 ### Virements récurrents
-Les virements récurrents sont gérés par Celery Beat. Ils s'exécutent automatiquement en arrière-plan sans intervention de l'utilisateur. Ainsi, si l'utilisateur veut programmer en automatique le paiement d'un abonnement mensuel depuis un compte, ou le virement d'une eparggne d'un compte courant vers son compte épargne, il pourra y souscrire. De ce fait, chaque mois/semaine/jour une somme prédéfini sera transférée au compte destinataire automatiquement.
+Les virements récurrents sont gérés par Celery Beat. Ils s'exécutent automatiquement en arrière-plan sans intervention de l'utilisateur. Ainsi, si l'utilisateur veut programmer en automatique le paiement d'un abonnement mensuel depuis un compte, ou le virement d'une épargne d'un compte courant vers son compte épargne, il pourra y souscrire. De ce fait, chaque mois / semaine / jour une somme prédéfinie sera transférée au compte destinataire automatiquement.
 
 - Création d'un virement récurrent (quotidien, hebdomadaire, mensuel)
 - Date de début et date de fin optionnelle
@@ -140,7 +139,7 @@ Après **3 tentatives de mot de passe incorrectes**, l'accès est bloqué pendan
 Si un même compte se connecte **plus de 2 fois en moins de 10 minutes**, un email d'alerte est automatiquement envoyé à l'adresse de l'utilisateur avec l'IP utilisée et l'horodatage. L'utilisateur est ainsi informé immédiatement si quelqu'un d'autre accède à son compte.
 
 ### Déconnexion automatique par inactivité
-La session expire après **30 minutes sans activité**. Un popup s'affiche 5 minutes avant l'expiration (donc, après 25 minutes) avec un compte à rebours. Si l'utilisateur ne réagit pas, il est déconnecté automatiquement. Toute activité sur la page (clic, scroll, frappe clavier) réinitialise le minuteur.
+La session expire après **30 minutes sans activité**. Un popup s'affiche 5 minutes avant l'expiration (donc après 25 minutes) avec un compte à rebours. Si l'utilisateur ne réagit pas, il est déconnecté automatiquement. Toute activité sur la page (clic, scroll, frappe clavier) réinitialise le minuteur.
 
 ### Plafond journalier de virement
 Chaque compte peut avoir un plafond journalier de virement, défini par l'utilisateur lui-même. Ce plafond cumule tous les virements de la journée. Si la somme des virements du jour atteint le plafond, tout nouveau virement est refusé avec un message indiquant le montant restant disponible.
@@ -178,35 +177,6 @@ examproject/
 
 ---
 
-## Installation
-
-```bash
-# 1. Cloner le projet
-git clone <url-du-repo>
-cd examproject
-
-# 2. Installer les dépendances
-pip install -r requirements.txt
-
-# 3. Configurer la base de données dans config/settings.py
-# (MySQL — créer la base exam_banque au préalable)
-
-# 4. Appliquer les migrations
-python manage.py migrate
-
-# 5. Créer un superutilisateur
-python manage.py createsuperuser
-
-# 6. Lancer le serveur
-python manage.py runserver
-
-# 7. (Optionnel) Lancer Celery pour les virements récurrents
-celery -A config worker --loglevel=info
-celery -A config beat --loglevel=info
-```
-
----
-
 ## Dépendances principales
 
 ```
@@ -216,24 +186,25 @@ celery
 redis
 django-celery-beat
 reportlab
+python-decouple
 ```
 
 ---
 
 ## Notes de développement
 
-- `DEBUG = True` en développement; passer à `False` en production
+- `DEBUG = True` en développement ; passer à `False` en production
 - Les pages d'erreur 404 et 500 sont personnalisées aux couleurs d'Imara Banque
-- Le `SECRET_KEY` et les mots de passe ne doivent pas être versionnés; utiliser des variables d'environnement en production
-- L'envoi d'emails utilise SMTP Gmail; configurer un mot de passe d'application dédié
+- Les secrets (`SECRET_KEY`, mots de passe) sont gérés via `.env` avec `python-decouple` — ne jamais versionner le fichier `.env`
+- L'envoi d'emails utilise SMTP Gmail ; configurer un mot de passe d'application dédié
 
 ---
 
 ## Auteur
 
-Projet réalisé dans le cadre d'un examen Django par Monsieur Demba Guissé, élève ingénieur en Informatique et Télécommunications à l'Ecole Polytechnique de Thiès.
+Projet réalisé dans le cadre d'un examen Django par Monsieur Demba Guissé, élève ingénieur en Informatique et Télécommunications à l'École Polytechnique de Thiès.
 Interface et logique métier entièrement développées from scratch.
 
 ---
 
-*Imara Banque -- Sécurisée • Simple • Rapide*
+*Imara Banque — Sécurisée • Simple • Rapide*

@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h2>Bonjour, {{ request.user.username }}</h2>
+
+        <p class="text-muted"> Bienvenue chez Imara Banque • votre espace bancaire sécurisé.</p>
+        <hr>
+    </div>
+</div>
+
+
+
+<div class="row mt-2">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary shadow">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-credit-card">  </i> Mes Comptes</i></h5>
+                <a href="{% url 'solde' %}" class="btn btn-light btn-sm mt-2">Voir le solde</a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success shadow">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-list-alt"></i>   Transactions</h5>
+                <a href="{% url 'historique' %}" class="btn btn-light btn-sm mt-2">Voir l'historique</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-warning shadow">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-exchange-alt"></i>   Virement</h5>
+                <a href="{% url 'virement' %}" class="btn btn-light btn-sm mt-2">Effectuer</a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-secondary shadow">
+            <div class="card-body text-center">
+                <h5><i class="fas fa-journal-whills"></i>   Journal</h5>
+                <a href="{% url 'journal' %}" class="btn btn-light btn-sm mt-2">Voir le journal</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="row mt-5 mb-4">
+    <div class="col-12 text-center">
+        <h3 class="mb-4">Nos services bancaires</h3>
+    </div>
+
+    <div class="col-12" style="position: relative;">
+
+        <!-- Carousel -->
+        <div id="servicesCarousel" style="overflow: hidden; position: relative;">
+            <div id="carouselTrack" style="display: flex; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); gap: 24px;">
+
+                <!-- Carte 1 -->
+                <div class="carousel-slide" style="min-width: calc(50% - 12px); flex-shrink: 0;">
+                    <div class="card border-0 shadow-lg overflow-hidden">
+                        <img src="/static/images/Capture d'écran 2026-03-31 150015.png"
+                            alt="Banque Mobile"
+                            style="height: 250px; object-fit: cover; transition: transform 0.3s ease;">
+                        <div class="card-body text-center bg-light">
+                            <h5 class="card-title text-primary">
+                                <i class="fas fa-mobile-alt me-2"></i>Banque Mobile
+                            </h5>
+                            <p class="card-text text-muted">Gérez vos comptes où que vous soyez</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte 2 -->
+                <div class="carousel-slide" style="min-width: calc(50% - 12px); flex-shrink: 0;">
+                    <div class="card border-0 shadow-lg overflow-hidden">
+                        <img src="/static/images/jason-dent-3wPJxh-piRw-unsplash.jpg"
+                            alt="Sécurité bancaire"
+                            style="height: 250px; object-fit: cover; transition: transform 0.3s ease;">
+                        <div class="card-body text-center bg-light">
+                            <h5 class="card-title text-success">
+                                <i class="fas fa-shield-alt me-2"></i>Sécurité Maximale
+                            </h5>
+                            <p class="card-text text-muted">Vos transactions sont protégées 24/7</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte 3 -->
+                <div class="carousel-slide" style="min-width: calc(50% - 12px); flex-shrink: 0;">
+                    <div class="card border-0 shadow-lg overflow-hidden">
+                        <img src="/static/images/Capture d'écran 2026-04-03 234338.png"
+                            alt="Virement instantané"
+                            style="height: 250px; object-fit: cover; transition: transform 0.3s ease;">
+                        <div class="card-body text-center bg-light">
+                            <h5 class="card-title" style="color: var(--champagne);">
+                                <i class="fas fa-bolt me-2"></i>Virement Instantané
+                            </h5>
+                            <p class="card-text text-muted">Transférez en quelques secondes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte 4  -->
+                <div class="carousel-slide" style="min-width: calc(50% - 12px); flex-shrink: 0;">
+                    <div class="card border-0 shadow-lg overflow-hidden">
+                        <img src="/static/images/view.png"
+                            alt="Épargne intelligente"
+                            style="height: 250px; object-fit: cover; transition: transform 0.3s ease;">
+                        <div class="card-body text-center bg-light">
+                            <h5 class="card-title text-warning">
+                                <i class="fas fa-piggy-bank me-2"></i>Épargne Intelligente
+                            </h5>
+                            <p class="card-text text-muted">Faites fructifier votre argent</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte 5 — remplacez IMAGE_5.jpg par votre fichier -->
+                <div class="carousel-slide" style="min-width: calc(50% - 12px); flex-shrink: 0;">
+                    <div class="card border-0 shadow-lg overflow-hidden">
+                        <img src="/static/images/view2.png"
+                            alt="Support client"
+                            style="height: 250px; object-fit: cover; transition: transform 0.3s ease;">
+                        <div class="card-body text-center bg-light">
+                            <h5 class="card-title text-info">
+                                <i class="fas fa-headset me-2"></i>Support 24/7
+                            </h5>
+                            <p class="card-text text-muted">Un conseiller toujours disponible</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Flèches navigation -->
+        <button onclick="carouselPrev()" style="
+            position: absolute; top: 50%; left: -20px; transform: translateY(-50%);
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--slate-dark, #2d3748);
+            border: 2px solid var(--champagne, #d4a843);
+            color: var(--champagne, #d4a843);
+            font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; z-index: 10;">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button onclick="carouselNext()" style="
+            position: absolute; top: 50%; right: -20px; transform: translateY(-50%);
+            width: 42px; height: 42px; border-radius: 50%;
+            background: var(--slate-dark, #2d3748);
+            border: 2px solid var(--champagne, #d4a843);
+            color: var(--champagne, #d4a843);
+            font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; z-index: 10;">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <!-- Points de navigation -->
+        <div style="display: flex; justify-content: center; gap: 8px; margin-top: 1.25rem;">
+            <span class="carousel-dot active" onclick="carouselGo(0)" style="
+                width: 8px; height: 8px; border-radius: 50%; cursor: pointer;
+                background: var(--champagne, #d4a843); transition: all 0.3s;"></span>
+            <span class="carousel-dot" onclick="carouselGo(1)" style="
+                width: 8px; height: 8px; border-radius: 50%; cursor: pointer;
+                background: #ccc; transition: all 0.3s;"></span>
+            <span class="carousel-dot" onclick="carouselGo(2)" style="
+                width: 8px; height: 8px; border-radius: 50%; cursor: pointer;
+                background: #ccc; transition: all 0.3s;"></span>
+            <span class="carousel-dot" onclick="carouselGo(3)" style="
+                width: 8px; height: 8px; border-radius: 50%; cursor: pointer;
+                background: #ccc; transition: all 0.3s;"></span>
+        </div>
+
+    </div>
+</div>
+
+<script>
+var carouselIndex = 0;
+var totalSlides   = 5;
+var visibles      = 2;
+var maxIndex      = totalSlides - visibles; // 3 positions : 0,1,2,3
+
+function carouselUpdate() {
+    var track    = document.getElementById('carouselTrack');
+    var slideW   = track.querySelector('.carousel-slide').offsetWidth + 24;
+    track.style.transform = 'translateX(-' + (carouselIndex * slideW) + 'px)';
+
+    // Mettre à jour les points
+    document.querySelectorAll('.carousel-dot').forEach(function(dot, i) {
+        dot.style.background = (i === carouselIndex)
+            ? 'var(--champagne, #d4a843)'
+            : '#ccc';
+        dot.style.width  = (i === carouselIndex) ? '22px' : '8px';
+        dot.style.borderRadius = '4px';
+    });
+}
+
+function carouselNext() {
+    carouselIndex = (carouselIndex >= maxIndex) ? 0 : carouselIndex + 1;
+    carouselUpdate();
+}
+
+function carouselPrev() {
+    carouselIndex = (carouselIndex <= 0) ? maxIndex : carouselIndex - 1;
+    carouselUpdate();
+}
+
+function carouselGo(i) {
+    carouselIndex = i;
+    carouselUpdate();
+}
+
+// Défilement automatique toutes les 4 secondes
+var autoplay = setInterval(carouselNext, 4000);
+
+// Pause au survol
+document.getElementById('servicesCarousel').addEventListener('mouseenter', function() {
+    clearInterval(autoplay);
+});
+document.getElementById('servicesCarousel').addEventListener('mouseleave', function() {
+    autoplay = setInterval(carouselNext, 4000);
+});
+</script>
+
+
+
+
+<style>
+    .card-img-top:hover {
+        transform: scale(1.05);
+    }
+
+
+    .card {
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .dropdown-menu-custom {
+        display: none;
+        position: fixed !important;
+        z-index: 99999 !important;
+        min-width: 300px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        padding: 1rem;
+        pointer-events: auto;
+    }
+</style>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h2><i class="fas fa-credit-card me-2" style="color: var(--champagne); font-size: 1.2rem;"></i> Mes Comptes</h2>
+        <hr>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+{% if comptes %}
+
+    <!-- Cartes de comptes -->
+    <div class="row">
+        {% for compte in comptes %}
+        <div class="col-md-6 mb-4">
+            <div class="card" style="border-left: 3px solid var(--champagne) !important;">
+
+                <div class="card-header bg-primary" style="border-left: none !important; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+                    <h5 class="mb-0" style="color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 1rem;">
+                        {{ compte.get_type_compte_display }}
+                    </h5>
+                    <span style="font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--champagne); opacity: 0.85;">
+                        {{ compte.numero_compte }}
+                    </span>
+                </div>
+
+                <div class="card-body" style="padding: 1.5rem;">
+
+                    <div style="margin-bottom: 1.25rem;">
+                        <p style="margin: 0; font-size: 0.68rem; color: var(--gray-mid); letter-spacing: 0.08em; text-transform: uppercase;">Solde disponible</p>
+                        <h3 class="text-success" style="margin: 0.25rem 0 0;">{{ compte.solde|floatformat:0 }} FCFA</h3>
+                    </div>
+
+                    <div style="background: var(--off-white); border: 1px solid var(--gray-light); border-radius: 6px; padding: 0.65rem 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                            <i class="fas fa-sliders-h" style="font-size: 11px; color: var(--champagne);"></i>
+                            <span style="font-size: 0.78rem; color: var(--gray-mid);">Plafond journalier</span>
+                        </div>
+                        <span style="font-size: 0.82rem; font-weight: 500; color: var(--black);">
+                            {% if compte.plafond_virement %}
+                                {{ compte.plafond_virement|floatformat:0 }} FCFA
+                            {% else %}
+                                <span style="color: var(--gray-mid); font-style: italic;">Illimité</span>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <p style="margin: 0 0 1.25rem; font-size: 0.78rem; color: var(--gray-mid);">
+                        <i class="fas fa-calendar-alt me-1" style="font-size: 10px;"></i>
+                        Ouvert le {{ compte.date_creation|date:"d/m/Y" }}
+                    </p>
+
+                    <!-- Boutons d'action -->
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--gray-light); padding-top: 1rem;">
+                        <a href="{% url 'historique' %}" class="btn btn-light btn-sm"
+                            style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem;">
+                            <i class="fas fa-list-alt" style="font-size: 10px;"></i>
+                            Transactions
+                        </a>
+                        <a href="{% url 'virement' %}" class="btn btn-light btn-sm"
+                            style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem;">
+                            <i class="fas fa-exchange-alt" style="font-size: 10px;"></i>
+                            Virement
+                        </a>
+                        <a href="{% url 'modifier_plafond' compte.id %}" class="btn btn-primary btn-sm"
+                            style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem;">
+                            <i class="fas fa-sliders-h" style="font-size: 10px;"></i>
+                            Plafond
+                        </a>
+
+                        <!-- Bouton Relevé PDF par compte -->
+                        <button
+                            class="btn btn-light btn-sm"
+                            style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; border: 1.5px solid var(--champagne); color: var(--champ-dark);"
+                            onclick="ouvrirDropdown(event, 'dropdown-{{ compte.id }}')"
+                            type="button">
+                            <i class="fas fa-file-pdf" style="font-size: 10px;"></i>
+                            Relevé PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bouton relevé global (tous comptes) -->
+    <div class="row">
+        <div class="col-12 mb-3 d-flex justify-content-end">
+            <button
+                class="btn btn-primary btn-sm"
+                style="display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--champagne);"
+                onclick="ouvrirDropdown(event, 'dropdown-tous')"
+                type="button">
+                <i class="fas fa-file-pdf" style="font-size: 11px;"></i>
+                Relevé global (tous comptes)
+            </button>
+        </div>
+    </div>
+
+    <!-- Graphique évolution du solde -->
+    <div class="row mt-2 mb-4">
+        <div class="col-12">
+            <div class="card" style="border-top: 3px solid var(--champagne) !important;">
+
+                <div class="card-header bg-primary" style="border-left: 4px solid var(--champagne) !important; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <h5 class="mb-0" style="color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 1rem;">
+                        <i class="fas fa-chart-line me-2" style="color: var(--champagne);"></i>
+                        Évolution du solde  •  30 derniers jours
+                    </h5>
+                    {% if comptes|length > 1 %}
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="legendeToggle">
+                        {% for compte in comptes %}
+                        <button onclick="toggleDataset({{ forloop.counter0 }})" id="btn-{{ forloop.counter0 }}"
+                            style="font-size: 0.68rem; padding: 0.28rem 0.7rem; border-radius: 20px; border: 1.5px solid var(--champagne); background: var(--champagne); color: #1a1a1a; font-weight: 500; cursor: pointer; letter-spacing: 0.04em; transition: all 0.2s;">
+                            {{ compte.numero_compte|slice:"-6:" }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body" style="padding: 1.5rem;">
+                    <div style="position: relative; height: 280px;">
+                        <canvas id="soldeChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% else %}
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2" style="font-size: 13px;"></i>
+        Vous n'avez aucun compte actif.
+    </div>
+{% endif %}
+
+
+<!-- ═══════════════════════════════════════════════════════
+     DROPDOWNS — attachés au body via JS, hors de tout flux
+════════════════════════════════════════════════════════ -->
+
+{% for compte in comptes %}
+<div id="dropdown-{{ compte.id }}" class="dropdown-menu-custom">
+    <p style="font-size: 0.72rem; color: #666; margin-bottom: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;">
+        <i class="fas fa-calendar-alt me-1" style="color: var(--champagne);"></i>
+        Période du relevé
+    </p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 0.75rem;">
+        <div>
+            <label style="font-size: 0.68rem; color: #666; display: block; margin-bottom: 3px;">Du</label>
+            <input type="date" id="debut-{{ compte.id }}" class="form-control form-control-sm" style="font-size: 0.78rem;">
+        </div>
+        <div>
+            <label style="font-size: 0.68rem; color: #666; display: block; margin-bottom: 3px;">Au</label>
+            <input type="date" id="fin-{{ compte.id }}" class="form-control form-control-sm" style="font-size: 0.78rem;">
+        </div>
+    </div>
+    <div style="display: flex; gap: 6px; margin-bottom: 0.75rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('{{ compte.id }}', 7)">7 jours</button>
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('{{ compte.id }}', 30)">30 jours</button>
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('{{ compte.id }}', 90)">3 mois</button>
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('{{ compte.id }}', 365)">1 an</button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
+        <label style="display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #333; cursor: pointer;">
+            <input type="checkbox" id="rec-{{ compte.id }}" checked style="accent-color: var(--champagne);">
+            Inclure virements récurrents
+        </label>
+    </div>
+    <button type="button"
+        data-url="{% url 'releve_pdf' compte.id %}"
+        data-id="{{ compte.id }}"
+        onclick="telechargerReleve(this.dataset.id, this.dataset.url)"
+        class="btn btn-primary btn-sm w-100"
+        style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem;">
+        <i class="fas fa-download" style="font-size: 10px;"></i>
+        Télécharger le relevé
+    </button>
+</div>
+{% endfor %}
+
+<div id="dropdown-tous" class="dropdown-menu-custom">
+    <p style="font-size: 0.72rem; color: #666; margin-bottom: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em;">
+        <i class="fas fa-calendar-alt me-1" style="color: var(--champagne);"></i>
+        Période
+    </p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 0.75rem;">
+        <div>
+            <label style="font-size: 0.68rem; color: #666; display: block; margin-bottom: 3px;">Du</label>
+            <input type="date" id="debut-tous" class="form-control form-control-sm" style="font-size: 0.78rem;">
+        </div>
+        <div>
+            <label style="font-size: 0.68rem; color: #666; display: block; margin-bottom: 3px;">Au</label>
+            <input type="date" id="fin-tous" class="form-control form-control-sm" style="font-size: 0.78rem;">
+        </div>
+    </div>
+    <div style="display: flex; gap: 6px; margin-bottom: 0.75rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('tous', 7)">7j</button>
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('tous', 30)">30j</button>
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('tous', 90)">3 mois</button>
+        <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.2rem 0.6rem;" onclick="setPeriode('tous', 365)">1 an</button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem;">
+        <label style="display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: #333; cursor: pointer;">
+            <input type="checkbox" id="rec-tous" checked style="accent-color: var(--champagne);">
+            Inclure virements récurrents
+        </label>
+    </div>
+    <button type="button"
+        data-url="{% url 'releve_pdf_tous' %}"
+        data-id="tous"
+        onclick="telechargerReleve(this.dataset.id, this.dataset.url)"
+        class="btn btn-primary btn-sm w-100"
+        style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem;">
+        <i class="fas fa-download" style="font-size: 10px;"></i>
+        Télécharger
+    </button>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script>
+// ── Déplacer tous les dropdowns dans le body au chargement ──────────
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.dropdown-menu-custom').forEach(function(d) {
+        document.body.appendChild(d);
+    });
+
+    // Initialiser les dates à -30j / aujourd'hui
+    var today = new Date();
+    var d30   = new Date();
+    d30.setDate(d30.getDate() - 30);
+    var fmt = function(d) {
+        return d.getFullYear() + '-' +
+               String(d.getMonth()+1).padStart(2,'0') + '-' +
+               String(d.getDate()).padStart(2,'0');
+    };
+    document.querySelectorAll('[id^="debut-"]').forEach(function(el) { el.value = fmt(d30); });
+    document.querySelectorAll('[id^="fin-"]').forEach(function(el)   { el.value = fmt(today); });
+});
+
+// ── Ouvrir / positionner un dropdown ───────────────────────────────
+function ouvrirDropdown(event, id) {
+    event.stopPropagation();
+    var dropdown = document.getElementById(id);
+    if (!dropdown) return;
+
+    var isOpen = dropdown.style.display === 'block';
+
+    // Fermer tous
+    document.querySelectorAll('.dropdown-menu-custom').forEach(function(d) {
+        d.style.display = 'none';
+    });
+
+    if (isOpen) return;
+
+    // Positionner par rapport au bouton cliqué
+    var btn  = event.currentTarget;
+    var rect = btn.getBoundingClientRect();
+
+    dropdown.style.display = 'block';
+    dropdown.style.top  = (rect.bottom + 6) + 'px';   // ← pas de scrollY ici !
+    dropdown.style.left = rect.left + 'px';
+
+    // Correction débordement droite
+    var dw = dropdown.offsetWidth;
+    if (rect.left + dw > window.innerWidth) {
+        dropdown.style.left = (window.innerWidth - dw - 10) + 'px';
+    }
+
+    // Correction débordement bas
+    var dh = dropdown.offsetHeight;
+    if (rect.bottom + dh + 6 > window.innerHeight) {
+        dropdown.style.top = (rect.top - dh - 6) + 'px';
+    }
+}
+
+// ── Fermer au clic extérieur ────────────────────────────────────────
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-menu-custom')) {
+        document.querySelectorAll('.dropdown-menu-custom').forEach(function(d) {
+            d.style.display = 'none';
+        });
+    }
+});
+
+// ── Raccourcis de période ───────────────────────────────────────────
+function setPeriode(id, jours) {
+    var fin   = new Date();
+    var debut = new Date();
+    debut.setDate(debut.getDate() - jours);
+    var fmt = function(d) {
+        return d.getFullYear() + '-' +
+               String(d.getMonth()+1).padStart(2,'0') + '-' +
+               String(d.getDate()).padStart(2,'0');
+    };
+    var df = document.getElementById('debut-' + id);
+    var ff = document.getElementById('fin-'   + id);
+    if (df) df.value = fmt(debut);
+    if (ff) ff.value = fmt(fin);
+}
+
+// ── Téléchargement ──────────────────────────────────────────────────
+function telechargerReleve(id, baseUrl) {
+    var debut = document.getElementById('debut-' + id);
+    var fin   = document.getElementById('fin-'   + id);
+    var rec   = document.getElementById('rec-'   + id);
+    if (!debut || !fin) { alert('Champs de date introuvables.'); return; }
+    if (!debut.value || !fin.value) { alert('Veuillez sélectionner une période.'); return; }
+    window.location.href = baseUrl +
+        '?date_debut=' + debut.value +
+        '&date_fin='   + fin.value +
+        '&avec_recurrents=' + (rec && rec.checked ? '1' : '0');
+}
+
+// ── Graphique Chart.js ──────────────────────────────────────────────
+var graphiqueData = {{ graphique_data|safe }};
+var chart;
+
+var ctx = document.getElementById('soldeChart');
+if (ctx) {
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: graphiqueData,
+        options: {
+            responsive          : true,
+            maintainAspectRatio : false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    display : graphiqueData.datasets.length > 1,
+                    position: 'top',
+                    labels  : {
+                        font         : { size: 11, family: 'DM Sans, sans-serif' },
+                        color        : '#4a5568',
+                        boxWidth     : 12,
+                        padding      : 16,
+                        usePointStyle: true,
+                        pointStyle   : 'circle',
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#2d3748',
+                    titleColor     : '#d4a843',
+                    bodyColor      : 'rgba(255,255,255,0.85)',
+                    borderColor    : '#d4a843',
+                    borderWidth    : 1,
+                    padding        : 12,
+                    titleFont      : { size: 11, family: 'DM Sans, sans-serif' },
+                    bodyFont       : { size: 12, family: 'DM Sans, sans-serif' },
+                    callbacks: {
+                        label: function(context) {
+                            var val = context.parsed.y;
+                            return '  ' + context.dataset.label + ' : ' +
+                                new Intl.NumberFormat('fr-FR').format(val) + ' FCFA';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid : { color: 'rgba(0,0,0,0.04)' },
+                    ticks: { font: { size: 10, family: 'DM Sans, sans-serif' }, color: '#9a9591', maxTicksLimit: 10 }
+                },
+                y: {
+                    grid : { color: 'rgba(0,0,0,0.06)' },
+                    ticks: {
+                        font    : { size: 10, family: 'DM Sans, sans-serif' },
+                        color   : '#9a9591',
+                        callback: function(val) {
+                            return new Intl.NumberFormat('fr-FR', {
+                                notation: 'compact', compactDisplay: 'short'
+                            }).format(val) + ' F';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function toggleDataset(index) {
+    if (!chart) return;
+    var meta    = chart.getDatasetMeta(index);
+    var btn     = document.getElementById('btn-' + index);
+    var couleur = graphiqueData.datasets[index].borderColor;
+    if (meta.hidden) {
+        meta.hidden           = false;
+        btn.style.background  = couleur;
+        btn.style.borderColor = couleur;
+        btn.style.color       = '#1a1a1a';
+    } else {
+        meta.hidden           = true;
+        btn.style.background  = 'transparent';
+        btn.style.color       = '#9a9591';
+        btn.style.borderColor = '#e2e0db';
+    }
+    chart.update();
+}
+</script>
+
+{% endblock %}

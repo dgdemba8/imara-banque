@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mt-4">
+  <div class="col-12 d-flex align-items-center justify-content-between" style="margin-bottom: 0.5rem;">
+    <h2><i class="fas fa-sync-alt me-2" style="color: var(--champagne); font-size: 1.2rem;"></i> Virements Récurrents</h2>
+    <a href="{% url 'creer_virement_recurrent' %}" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 7px;">
+      <i class="fas fa-plus" style="font-size: 11px;"></i>
+      Nouveau
+    </a>
+  </div>
+  <div class="col-12"><hr></div>
+</div>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+{% if recurrents %}
+<div class="row">
+  {% for v in recurrents %}
+  <div class="col-md-6 mb-4">
+    <div class="card" style="border-left: 3px solid
+      {% if v.statut == 'actif' %}var(--champagne)
+      {% elif v.statut == 'pause' %}var(--gray-mid)
+      {% else %}#a93226{% endif %} !important;">
+
+      <div class="card-body" style="padding: 1.25rem 1.5rem;">
+
+        <!-- En-tête : montant + badge statut -->
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem;">
+          <div>
+            <p style="margin: 0; font-size: 0.68rem; color: var(--gray-mid); letter-spacing: 0.07em; text-transform: uppercase;">Montant</p>
+            <p style="margin: 0; font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: var(--black); line-height: 1.1;">
+              {{ v.montant|floatformat:0 }} <span style="font-size: 0.9rem; color: var(--gray-mid);">FCFA</span>
+            </p>
+          </div>
+          <span style="font-size: 0.68rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.3em 0.8em; border-radius: 20px; border: 1.5px solid
+            {% if v.statut == 'actif' %}var(--champagne); color: var(--champ-dark)
+            {% elif v.statut == 'pause' %}var(--gray-mid); color: var(--gray-mid)
+            {% else %}#a93226; color: #a93226{% endif %};">
+            {% if v.statut == 'actif' %}<i class="fas fa-circle" style="font-size: 7px; margin-right: 4px;"></i>{% endif %}
+            {{ v.get_statut_display }}
+          </span>
+        </div>
+
+        <!-- Détails -->
+        <div style="font-size: 0.83rem; color: var(--black); margin-bottom: 1rem;">
+          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 0.4rem;">
+            <i class="fas fa-arrow-right" style="color: var(--champagne); font-size: 10px; width: 14px;"></i>
+            <span style="color: var(--gray-mid);">{{ v.compte_source.numero_compte }}</span>
+            <i class="fas fa-long-arrow-alt-right" style="color: var(--gray-mid); font-size: 10px;"></i>
+            <span style="color: var(--gray-mid);">{{ v.compte_destination.numero_compte }}</span>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 0.4rem;">
+            <i class="fas fa-redo" style="color: var(--champagne); font-size: 10px; width: 14px;"></i>
+            <span>{{ v.get_frequence_display }}</span>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 0.4rem;">
+            <i class="fas fa-calendar-alt" style="color: var(--champagne); font-size: 10px; width: 14px;"></i>
+            <span>Prochaine exécution : <strong>{{ v.prochaine_execution|date:"d/m/Y" }}</strong></span>
+          </div>
+          {% if v.date_fin %}
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <i class="fas fa-calendar-times" style="color: var(--gray-mid); font-size: 10px; width: 14px;"></i>
+            <span style="color: var(--gray-mid);">Fin : {{ v.date_fin|date:"d/m/Y" }}</span>
+          </div>
+          {% endif %}
+          {% if v.motif %}
+          <div style="display: flex; gap: 6px; align-items: center; margin-top: 0.4rem;">
+            <i class="fas fa-tag" style="color: var(--gray-mid); font-size: 10px; width: 14px;"></i>
+            <span style="color: var(--gray-mid);">{{ v.motif }}</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Actions -->
+        {% if v.statut != 'termine' %}
+        <div style="display: flex; gap: 8px; border-top: 1px solid var(--gray-light); padding-top: 1rem;">
+          <!-- Toggle actif/pause -->
+          <form method="post" action="{% url 'toggle_virement_recurrent' v.id %}" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit"
+              style="display: inline-flex; align-items: center; gap: 5px; padding: 0.38rem 0.85rem; background: transparent; border: 1.5px solid var(--gray-light); border-radius: var(--radius); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; color: var(--slate-dark); transition: all 0.2s;">
+              {% if v.statut == 'actif' %}
+                <i class="fas fa-pause" style="font-size: 10px;"></i> Pause
+              {% else %}
+                <i class="fas fa-play" style="font-size: 10px;"></i> Reprendre
+              {% endif %}
+            </button>
+          </form>
+
+          <!-- Supprimer -->
+          <a href="{% url 'supprimer_virement_recurrent' v.id %}"
+            style="display: inline-flex; align-items: center; gap: 5px; padding: 0.38rem 0.85rem; background: transparent; border: 1.5px solid #f0b8b3; border-radius: var(--radius); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: #a93226; text-decoration: none; transition: all 0.2s;"
+            onmouseover="this.style.background='#fdf0ef'"
+            onmouseout="this.style.background='transparent'">
+            <i class="fas fa-trash" style="font-size: 10px;"></i> Supprimer
+          </a>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="alert alert-info" style="display: flex; align-items: center; gap: 10px;">
+  <i class="fas fa-info-circle" style="font-size: 16px;"></i>
+  <span>Aucun virement récurrent programmé.
+    <a href="{% url 'creer_virement_recurrent' %}" style="color: var(--champ-dark); font-weight: 500;">Créer le premier →</a>
+  </span>
+</div>
+{% endif %}
+
+{% endblock %}

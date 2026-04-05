@@ -1,0 +1,282 @@
+{% load static %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+.tb-nav {
+    background: var(--slate-dark, #2d3748);
+    border-bottom: 2px solid var(--champagne, #d4a843);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 62px;
+
+
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.tb-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff !important;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+}
+
+.tb-brand-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(212,168,67,0.18);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+.tb-brand-icon i { color: var(--champagne, #d4a843); font-size: 14px; }
+
+.tb-links {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    margin: 0; padding: 0;
+    flex: 1;
+    justify-content: center;
+}
+
+.tb-link { position: relative; }
+
+.tb-link a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.45rem 0.85rem;
+    color: rgba(255,255,255,0.68);
+    text-decoration: none;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    transition: color 0.2s ease, background 0.2s ease;
+    white-space: nowrap;
+    position: relative;
+}
+
+.tb-link a i {
+    color: var(--champagne, #d4a843);
+    font-size: 11px;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+}
+
+.tb-link a::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0.85rem; right: 0.85rem;
+    height: 1px;
+    background: var(--champagne, #d4a843);
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+}
+
+.tb-link a:hover {
+    color: var(--champagne, #d4a843);
+    background: rgba(212,168,67,0.07);
+}
+.tb-link a:hover::after { transform: scaleX(1); }
+.tb-link a:hover i { opacity: 1; }
+
+.tb-link.tb-active a { color: var(--champagne, #d4a843); }
+.tb-link.tb-active a::after { transform: scaleX(1); }
+
+.tb-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.tb-separator {
+    width: 1px; height: 22px;
+    background: rgba(255,255,255,0.12);
+    margin: 0 4px;
+}
+
+.tb-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tb-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(212,168,67,0.15);
+    border: 1.5px solid rgba(212,168,67,0.4);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+.tb-avatar i { color: var(--champagne, #d4a843); font-size: 12px; }
+
+.tb-username {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.tb-logout {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.38rem 0.85rem;
+    border: 1.5px solid rgba(212,168,67,0.45);
+    border-radius: 4px;
+    color: var(--champagne, #d4a843) !important;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.22s ease;
+    margin-left: 4px;
+}
+
+.tb-logout i { font-size: 11px; }
+
+.tb-logout:hover {
+    background: var(--champagne, #d4a843);
+    color: #1a1a1a !important;
+    border-color: var(--champagne, #d4a843);
+}
+
+.tb-toggler {
+    display: none;
+    background: none;
+    border: 1.5px solid rgba(212,168,67,0.45);
+    border-radius: 4px;
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+    color: var(--champagne, #d4a843);
+    font-size: 1rem;
+}
+
+@media (max-width: 991px) {
+    .tb-toggler { display: flex; align-items: center; }
+    .tb-links, .tb-right { display: none; }
+    .tb-nav.tb-open .tb-links,
+    .tb-nav.tb-open .tb-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 0;
+    }
+    .tb-nav {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 0.85rem 1.5rem;
+    }
+    .tb-nav.tb-open { padding-bottom: 1rem; }
+    .tb-links { gap: 0; margin-top: 0.5rem; }
+    .tb-link a { padding: 0.55rem 0.5rem; }
+    .tb-right { margin-top: 0.5rem; flex-direction: row; flex-wrap: wrap; gap: 8px; }
+    .tb-separator { display: none; }
+}
+
+
+
+
+/* Animation - lueur */
+@keyframes lueur {
+    0%   { left: -100%; opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { left: 110%; opacity: 0; }
+}
+
+.tb-nav::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60px;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(212, 168, 67, 0.15) 40%,
+        rgba(212, 168, 67, 0.35) 50%,
+        rgba(212, 168, 67, 0.15) 60%,
+        transparent 100%
+    );
+    animation: lueur 4s ease-in-out infinite;
+    animation-delay: 2s;
+    pointer-events: none;
+}
+
+
+</style>
+
+<nav class="tb-nav" id="tbNav">
+    <a class="tb-brand" href="{% url 'dashboard' %}">
+    <img src="{% static 'images/logo.png' %}"
+        alt="Imara Banque"
+        style="width: 62px; height: 62px; object-fit: contain; filter: brightness(1.1);">
+    <span style="
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        font-style: italic;
+    ">Imara Banque</span>
+</a>
+    {% if request.user.is_authenticated %}
+
+    <button class="tb-toggler" onclick="document.getElementById('tbNav').classList.toggle('tb-open')">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <ul class="tb-links">
+        <li class="tb-link {% if request.resolver_match.url_name == 'dashboard' %}tb-active{% endif %}">
+            <a href="{% url 'dashboard' %}"><i class="fas fa-home"></i> Accueil</a>
+        </li>
+        <li class="tb-link {% if request.resolver_match.url_name == 'solde' %}tb-active{% endif %}">
+            <a href="{% url 'solde' %}"><i class="fas fa-credit-card"></i> Mes Comptes</a>
+        </li>
+        <li class="tb-link {% if request.resolver_match.url_name == 'historique' %}tb-active{% endif %}">
+            <a href="{% url 'historique' %}"><i class="fas fa-list-alt"></i> Transactions</a>
+        </li>
+        <li class="tb-link {% if request.resolver_match.url_name == 'virement' %}tb-active{% endif %}">
+            <a href="{% url 'virement' %}"><i class="fas fa-exchange-alt"></i> Virement</a>
+        </li>
+        <li class="tb-link {% if request.resolver_match.url_name == 'virements_recurrents' %}tb-active{% endif %}">
+            <a href="{% url 'virements_recurrents' %}"><i class="fas fa-sync-alt"></i> Récurrents</a>
+        </li>
+        <li class="tb-link {% if request.resolver_match.url_name == 'journal' %}tb-active{% endif %}">
+            <a href="{% url 'journal' %}"><i class="fas fa-journal-whills"></i> Journal</a>
+        </li>
+    </ul>
+
+    <div class="tb-right">
+        <div class="tb-user">
+            <div class="tb-avatar"><i class="fas fa-user"></i></div>
+            <span class="tb-username">{{ request.user.username }}</span>
+        </div>
+        <div class="tb-separator"></div>
+        <a href="{% url 'deconnexion' %}" class="tb-logout">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+
+    {% endif %}
+</nav>

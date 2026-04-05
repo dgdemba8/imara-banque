@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center; display: flex;">
+  <div class="col-md-5 col-lg-4">
+
+    <div class="card" style="border-top: 3px solid #a93226 !important; overflow: hidden;">
+
+      <div class="card-header bg-primary" style="border-left: 4px solid var(--champagne) !important; padding: 1.25rem 1.5rem;">
+        <h5 class="mb-0" style="color: #fff;">
+          <i class="fas fa-trash me-2" style="color: #f0b8b3;"></i>
+          Supprimer le virement récurrent
+        </h5>
+      </div>
+
+      <div class="card-body" style="padding: 2rem; text-align: center;">
+
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: #fdf0ef; border: 2px solid #f0b8b3; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+          <i class="fas fa-trash-alt" style="font-size: 22px; color: #a93226;"></i>
+        </div>
+
+        <h5 style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; margin-bottom: 0.5rem;">
+          Confirmer la suppression
+        </h5>
+        <p style="font-size: 0.85rem; color: var(--gray-mid); margin-bottom: 1.75rem; line-height: 1.6;">
+          Cette action est irréversible. Le virement récurrent sera définitivement supprimé.
+        </p>
+
+        <!-- Résumé du virement -->
+        <div style="background: var(--off-white); border: 1px solid var(--gray-light); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; text-align: left;">
+          <table style="width: 100%; font-size: 0.85rem;">
+            <tr style="border-bottom: 1px solid var(--gray-light);">
+              <td style="padding: 0.5rem 0; color: var(--gray-mid); width: 45%;">Montant</td>
+              <td style="padding: 0.5rem 0; font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700;">
+                {{ virement.montant|floatformat:0 }} FCFA
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--gray-light);">
+              <td style="padding: 0.5rem 0; color: var(--gray-mid);">Fréquence</td>
+              <td style="padding: 0.5rem 0;">{{ virement.get_frequence_display }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--gray-light);">
+              <td style="padding: 0.5rem 0; color: var(--gray-mid);">Source</td>
+              <td style="padding: 0.5rem 0;">{{ virement.compte_source.numero_compte }}</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.5rem 0; color: var(--gray-mid);">Destination</td>
+              <td style="padding: 0.5rem 0;">{{ virement.compte_destination.numero_compte }}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <a href="{% url 'virements_recurrents' %}"
+            style="display: inline-flex; align-items: center; gap: 6px; padding: 0.55rem 1.2rem; background: transparent; border: 1.5px solid var(--gray-light); border-radius: var(--radius); color: var(--gray-mid); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: all 0.2s ease;"
+            onmouseover="this.style.borderColor='var(--champagne)'; this.style.color='var(--champagne)'"
+            onmouseout="this.style.borderColor='var(--gray-light)'; this.style.color='var(--gray-mid)'">
+            <i class="fas fa-times" style="font-size: 10px;"></i>
+            Annuler
+          </a>
+          <form method="post" style="margin: 0;">
+            {% csrf_token %}
+            <button type="submit"
+              style="display: inline-flex; align-items: center; gap: 6px; padding: 0.55rem 1.2rem; background: #a93226; border: 1.5px solid #a93226; border-radius: var(--radius); color: #fff; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease;">
+              <i class="fas fa-trash" style="font-size: 10px;"></i>
+              Supprimer
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

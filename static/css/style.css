@@ -1,0 +1,497 @@
+/* ============================================================
+  THORYS BANK — Style principal
+  Palette : Gris ardoise #4a5568 | Or champagne #d4a843 | Noir #1a1a1a
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* --- Variables globales --- */
+:root {
+  --slate:        #4a5568;
+  --slate-dark:   #2d3748;
+  --slate-light:  #718096;
+  --champagne:    #d4a843;
+  --champ-light:  #e8c36a;
+  --champ-dark:   #b08a30;
+  --black:        #1a1a1a;
+  --black-soft:   #2c2c2c;
+  --white:        #ffffff;
+  --off-white:    #f8f7f4;
+  --gray-light:   #e2e0db;
+  --gray-mid:     #9a9591;
+  --shadow-sm:    0 2px 8px rgba(26,26,26,0.08);
+  --shadow-md:    0 6px 24px rgba(26,26,26,0.12);
+  --shadow-lg:    0 16px 48px rgba(26,26,26,0.16);
+  --radius:       6px;
+  --radius-lg:    10px;
+}
+
+/* --- Reset & base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  background-color: var(--off-white);
+  color: var(--black);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  color: var(--black);
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+  NAVBAR
+   ============================================================ */
+.navbar,
+nav.navbar,
+nav.navbar.navbar-dark.bg-primary {
+  background-color: var(--slate-dark) !important;
+  border-bottom: 2px solid var(--champagne) !important;
+  padding: 0.85rem 0;
+  box-shadow: var(--shadow-md);
+}
+
+.navbar-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--white) !important;
+  letter-spacing: 0.04em;
+}
+
+.navbar-brand i { color: var(--champagne); }
+
+.navbar-nav .nav-link {
+  color: rgba(255,255,255,0.72) !important;
+  font-weight: 400;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem !important;
+  position: relative;
+  transition: color 0.25s ease;
+}
+
+.navbar-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0.9rem;
+  right: 0.9rem;
+  height: 1px;
+  background: var(--champagne);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--champagne) !important;
+  transform: none !important;
+}
+
+.navbar-nav .nav-link:hover::after { transform: scaleX(1); }
+
+.navbar-nav .nav-link i {
+  color: var(--champagne);
+  opacity: 0.8;
+  margin-right: 5px;
+  font-size: 0.82em;
+}
+
+/* Nom utilisateur connecté */
+.navbar span.nav-link,
+.navbar .nav-link.text-white {
+  color: rgba(255,255,255,0.45) !important;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* Déconnexion */
+.navbar a.text-warning,
+.navbar a[href*="deconnexion"] {
+  color: var(--champagne) !important;
+  font-size: 0.82rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}
+.navbar a.text-warning:hover { color: var(--champ-light) !important; }
+
+/* ============================================================
+  MAIN
+   ============================================================ */
+main.container { max-width: 1100px; }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--gray-light);
+  margin: 0.75rem 0 1.5rem;
+}
+
+/* ============================================================
+  sTITRES DE SECTION
+   ============================================================ */
+h2 {
+  font-size: 1.75rem;
+  color: var(--black);
+  position: relative;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.25rem;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 36px;
+  height: 2px;
+  background: var(--champagne);
+  border-radius: 2px;
+}
+
+/* ============================================================
+  CARDS
+   ============================================================ */
+.card {
+  border: 1px solid var(--gray-light) !important;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  background: var(--white);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-3px) !important;
+}
+
+.card-header {
+  border-radius: 0 !important;
+  border-bottom: none !important;
+  padding: 1rem 1.25rem;
+}
+
+.card-header.bg-primary {
+  background-color: var(--slate-dark) !important;
+  border-left: 3px solid var(--champagne) !important;
+}
+
+.card-header.bg-primary h5,
+.card-header.bg-primary h4 {
+  color: var(--white);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+/* Cards dashboard unifiées */
+.card.text-white.bg-primary   { background-color: var(--slate-dark) !important; border-top: 3px solid var(--champagne)   !important; border-left: none !important; }
+.card.text-white.bg-success   { background-color: var(--black-soft)  !important; border-top: 3px solid var(--champagne)   !important; border-left: none !important; }
+.card.text-white.bg-warning   { background-color: var(--slate)       !important; border-top: 3px solid var(--champ-light) !important; border-left: none !important; }
+.card.text-white.bg-secondary { background-color: var(--black)       !important; border-top: 3px solid var(--champagne)   !important; border-left: none !important; }
+
+.card.text-white .card-body { text-align: center; padding: 1.6rem; }
+
+.card.text-white h5 {
+  color: var(--white);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.card-body { padding: 1.5rem; }
+
+.card-body h3.text-success {
+  color: var(--champ-dark) !important;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.card-img-top { transition: transform 0.4s ease !important; }
+.card:hover .card-img-top { transform: scale(1.04); }
+.card-title.text-primary { color: var(--slate-dark) !important; }
+.card-title.text-success  { color: var(--champ-dark) !important; }
+
+/* ============================================================
+  BOUTONS
+   ============================================================ */
+.btn-primary {
+  background-color: var(--slate-dark) !important;
+  border: 1.5px solid var(--champagne) !important;
+  color: var(--white) !important;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.8rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.4rem;
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--champagne) !important;
+  border-color: var(--champagne) !important;
+  color: var(--black) !important;
+  box-shadow: 0 4px 14px rgba(212,168,67,0.35) !important;
+}
+
+.btn-light {
+  background-color: transparent !important;
+  border: 1.5px solid var(--champagne) !important;
+  color: var(--champagne) !important;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius);
+  transition: all 0.25s ease;
+}
+
+.btn-light:hover {
+  background-color: var(--champagne) !important;
+  color: var(--black) !important;
+}
+
+/* ============================================================
+  FORMULAIRES
+   ============================================================ */
+.form-control, .form-select {
+  border: 1.5px solid var(--gray-light);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  color: var(--black);
+  background-color: var(--white);
+  padding: 0.6rem 0.9rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--champagne);
+  box-shadow: 0 0 0 3px rgba(212,168,67,0.18);
+  outline: none;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+  margin-bottom: 0.4rem;
+}
+
+/* ============================================================
+  TABLEAUX
+   ============================================================ */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 0;
+}
+
+.table thead.table-primary th {
+  background-color: var(--slate-dark) !important;
+  color: rgba(255,255,255,0.85) !important;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  border: none !important;
+  padding: 0.9rem 1rem;
+}
+
+.table thead.table-primary th:first-child {
+  border-left: 3px solid var(--champagne) !important;
+}
+
+.table tbody tr { transition: background-color 0.2s ease; }
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(248,247,244,0.8);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(212,168,67,0.07) !important;
+}
+
+.table td {
+  padding: 0.8rem 1rem;
+  border-top: 1px solid var(--gray-light) !important;
+  font-size: 0.88rem;
+  vertical-align: middle;
+  color: var(--black);
+}
+
+.fw-bold { font-weight: 600 !important; color: var(--black); }
+
+/* ============================================================
+  BADGES
+   ============================================================ */
+.badge.bg-success {
+  background-color: transparent !important;
+  border: 1.5px solid #4a7c59;
+  color: #4a7c59 !important;
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35em 0.7em;
+  border-radius: 20px;
+}
+
+.badge.bg-danger {
+  background-color: transparent !important;
+  border: 1.5px solid #a93226;
+  color: #a93226 !important;
+  font-weight: 500;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35em 0.7em;
+  border-radius: 20px;
+}
+
+/* ============================================================
+  ALERTES
+   ============================================================ */
+.alert {
+  border-radius: var(--radius);
+  border: none;
+  font-size: 0.88rem;
+  padding: 0.9rem 1.1rem;
+}
+
+.alert-danger  { background: #fdf0ef; border-left: 3px solid #a93226; color: #6b1f1f; }
+.alert-success { background: #f2f8f4; border-left: 3px solid #4a7c59; color: #2a4d38; }
+.alert-info    { background: #f4f5f7; border-left: 3px solid var(--slate); color: var(--slate-dark); }
+.alert-warning { background: #fdf8ec; border-left: 3px solid var(--champagne); color: var(--champ-dark); }
+
+/* ============================================================
+  PAGES CONNEXION
+   ============================================================ */
+.row.justify-content-center .card {
+  border-top: 3px solid var(--champagne) !important;
+}
+
+.row.justify-content-center .card-header {
+  background-color: var(--slate-dark) !important;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.row.justify-content-center .card-header h4 {
+  color: var(--white);
+  font-size: 1.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.row.justify-content-center .card-header p {
+  color: var(--champagne);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ============================================================
+  FOOTER — override complet
+============================================================ */
+footer,
+footer.bg-primary,
+footer.py-4,
+footer.mt-5 {
+  background-color: var(--slate-dark) !important;
+  border-top: 2px solid var(--champagne) !important;
+}
+
+footer * { color: rgba(255,255,255,0.6); }
+
+footer h4,
+footer h5 {
+  color: var(--white) !important;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+footer h4 i { color: var(--champagne) !important; }
+
+footer p,
+footer p.small { color: rgba(255,255,255,0.42) !important; font-size: 0.78rem; }
+
+footer a,
+footer a.text-white {
+  color: rgba(255,255,255,0.5) !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+footer a:hover,
+footer a.text-white:hover { color: var(--champagne) !important; }
+
+footer .badge.bg-light {
+  background-color: rgba(212,168,67,0.12) !important;
+  color: var(--champagne) !important;
+  border: 1px solid rgba(212,168,67,0.4) !important;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+footer hr { border-top: 1px solid rgba(255,255,255,0.08) !important; }
+
+footer .btn-outline-light {
+  border-color: rgba(255,255,255,0.2) !important;
+  color: rgba(255,255,255,0.55) !important;
+  background: transparent !important;
+  transition: all 0.25s ease !important;
+}
+
+footer .btn-outline-light:hover {
+  background-color: var(--champagne) !important;
+  border-color: var(--champagne) !important;
+  color: var(--black) !important;
+  transform: scale(1.1) !important;
+}
+
+/* Images paiement footer */
+footer img { filter: grayscale(20%); transition: opacity 0.3s ease; }
+footer img:hover { opacity: 0.8; }
+
+/* ============================================================
+UTILITAIRES
+============================================================ */
+.text-muted { color: var(--gray-mid) !important; font-size: 0.85rem; }
+small { color: var(--gray-mid); font-size: 0.8rem; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--off-white); }
+::-webkit-scrollbar-thumb { background: var(--gray-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--champagne); }
+
+
+
+
+
+
+
+
+

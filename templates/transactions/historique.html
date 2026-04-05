@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2" style="margin-bottom: 0.5rem;">
+        <h2 style="margin: 0;">
+            <i class="fas fa-list-alt me-2" style="color: var(--champagne); font-size: 1.2rem;"></i>
+            Historique des Transactions
+        </h2>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 0.78rem; color: var(--gray-mid);">
+                {{ nb_resultats }} résultat{{ nb_resultats|pluralize }}
+            </span>
+        </div>
+    </div>
+    <div class="col-12"><hr></div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<!-- ── Filtres ──────────────────────────────────────────────────── -->
+<div class="card mb-4" style="border-left: 3px solid var(--champagne) !important;">
+    <div class="card-body" style="padding: 1.25rem 1.5rem;">
+        <form method="get" id="filtreForm">
+            <div class="row g-3 align-items-end">
+
+                <!-- Compte -->
+                <div class="col-md-3">
+                    <label style="font-size: 0.72rem; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">
+                        <i class="fas fa-credit-card me-1" style="color: var(--champagne); font-size: 10px;"></i>
+                        Compte
+                    </label>
+                    <select name="compte" class="form-select form-select-sm" style="font-size: 0.82rem;">
+                        <option value="">Tous les comptes</option>
+                        {% for c in comptes %}
+                        <option value="{{ c.id }}" {% if filtre_compte == c.id|stringformat:"s" %}selected{% endif %}>
+                            {{ c.numero_compte }} — {{ c.get_type_compte_display }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Type -->
+                <div class="col-md-2">
+                    <label style="font-size: 0.72rem; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">
+                        <i class="fas fa-tag me-1" style="color: var(--champagne); font-size: 10px;"></i>
+                        Type
+                    </label>
+                    <select name="type" class="form-select form-select-sm" style="font-size: 0.82rem;">
+                        <option value="">Tous</option>
+                        <option value="virement" {% if filtre_type == 'virement' %}selected{% endif %}>Virement</option>
+                        <option value="depot"    {% if filtre_type == 'depot'    %}selected{% endif %}>Dépôt</option>
+                        <option value="retrait"  {% if filtre_type == 'retrait'  %}selected{% endif %}>Retrait</option>
+                    </select>
+                </div>
+
+                <!-- Date début -->
+                <div class="col-md-2">
+                    <label style="font-size: 0.72rem; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">
+                        <i class="fas fa-calendar me-1" style="color: var(--champagne); font-size: 10px;"></i>
+                        Du
+                    </label>
+                    <input type="date" name="date_debut" class="form-control form-control-sm"
+                           value="{{ filtre_debut }}" style="font-size: 0.82rem;">
+                </div>
+
+                <!-- Date fin -->
+                <div class="col-md-2">
+                    <label style="font-size: 0.72rem; color: var(--gray-mid); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 4px;">
+                        <i class="fas fa-calendar me-1" style="color: var(--champagne); font-size: 10px;"></i>
+                        Au
+                    </label>
+                    <input type="date" name="date_fin" class="form-control form-control-sm"
+                           value="{{ filtre_fin }}" style="font-size: 0.82rem;">
+                </div>
+
+                <!-- Boutons -->
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm"
+                        style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; flex: 1; justify-content: center;">
+                        <i class="fas fa-search" style="font-size: 10px;"></i>
+                        Filtrer
+                    </button>
+                    <a href="{% url 'historique' %}" class="btn btn-light btn-sm"
+                        style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; white-space: nowrap;">
+                        <i class="fas fa-times" style="font-size: 10px;"></i>
+                        Réinitialiser
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Raccourcis période -->
+            <div style="display: flex; gap: 6px; margin-top: 0.75rem; flex-wrap: wrap;">
+                <span style="font-size: 0.7rem; color: var(--gray-mid); align-self: center;">Période rapide :</span>
+                <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.15rem 0.55rem;" onclick="setRapide(7)">7 jours</button>
+                <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.15rem 0.55rem;" onclick="setRapide(30)">30 jours</button>
+                <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.15rem 0.55rem;" onclick="setRapide(90)">3 mois</button>
+                <button type="button" class="btn btn-light btn-sm" style="font-size: 0.68rem; padding: 0.15rem 0.55rem;" onclick="setRapide(365)">1 an</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ── Tableau ───────────────────────────────────────────────────── -->
+{% if transactions %}
+<div class="table-responsive">
+    <table class="table table-hover" style="font-size: 0.85rem;">
+        <thead>
+            <tr style="background: #2d3748; color: #fff;">
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">DATE</th>
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">TYPE</th>
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">MONTANT</th>
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">SOURCE</th>
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">DESTINATION</th>
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">MOTIF</th>
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">STATUT</th>
+                <th style="padding: 0.75rem 1rem; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.05em; border: none;">ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in transactions %}
+            <tr style="border-bottom: 1px solid var(--gray-light); {% if t.annule %}opacity: 0.6;{% endif %}">
+
+                <td style="padding: 0.75rem 1rem; color: var(--gray-mid); white-space: nowrap;">
+                    {{ t.date_transaction|date:"d/m/Y" }}<br>
+                    <span style="font-size: 0.72rem;">{{ t.date_transaction|date:"H:i" }}</span>
+                </td>
+
+                <td style="padding: 0.75rem 1rem;">
+                    {% if t.type_transaction == 'virement' %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 500; color: #2d3748;">
+                            <i class="fas fa-exchange-alt" style="color: var(--champagne); font-size: 10px;"></i>
+                            Virement
+                        </span>
+                    {% elif t.type_transaction == 'depot' %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 500; color: #2f855a;">
+                            <i class="fas fa-arrow-down" style="font-size: 10px;"></i>
+                            Dépôt
+                        </span>
+                    {% elif t.type_transaction == 'retrait' %}
+                        <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 500; color: #a93226;">
+                            <i class="fas fa-arrow-up" style="font-size: 10px;"></i>
+                            Retrait
+                        </span>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 0.75rem 1rem; font-weight: 600; white-space: nowrap;
+                    {% if t.annule %}color: var(--gray-mid); text-decoration: line-through;
+                    {% elif t.type_transaction == 'depot' %}color: #2f855a;
+                    {% else %}color: #2d3748;{% endif %}">
+                    {{ t.montant|floatformat:0 }} FCFA
+                </td>
+
+                <td style="padding: 0.75rem 1rem; font-size: 0.78rem; color: var(--gray-mid);">
+                    {{ t.compte_source.numero_compte }}
+                </td>
+
+                <td style="padding: 0.75rem 1rem; font-size: 0.78rem; color: var(--gray-mid);">
+                    {{ t.compte_destination.numero_compte|default:"—" }}
+                </td>
+
+                <td style="padding: 0.75rem 1rem; font-size: 0.78rem; color: var(--gray-mid); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    {{ t.motif|default:"—" }}
+                </td>
+
+                <td style="padding: 0.75rem 1rem;">
+                    {% if t.annule %}
+                        <span class="badge" style="background: #f0b8b3; color: #a93226; font-size: 0.68rem;">Annulé</span>
+                    {% elif t.statut %}
+                        <span class="badge" style="background: #c6f6d5; color: #276749; font-size: 0.68rem;">Succès</span>
+                    {% else %}
+                        <span class="badge" style="background: #fed7d7; color: #a93226; font-size: 0.68rem;">Échec</span>
+                    {% endif %}
+                </td>
+
+                <!-- Colonne Action : bouton Annuler si annulable -->
+                <td style="padding: 0.75rem 1rem;">
+                    {% if t.peut_annuler %}
+                        <a href="{% url 'annuler_virement' t.id %}"
+                            style="display: inline-flex; align-items: center; gap: 5px;
+                                   padding: 0.28rem 0.65rem;
+                                   border: 1.5px solid #f0b8b3;
+                                   border-radius: 4px;
+                                   color: #a93226;
+                                   font-size: 0.7rem;
+                                   font-weight: 500;
+                                   text-decoration: none;
+                                   white-space: nowrap;
+                                   transition: all 0.2s;"
+                            onmouseover="this.style.background='#fdf0ef'"
+                            onmouseout="this.style.background='transparent'">
+                            <i class="fas fa-undo" style="font-size: 9px;"></i>
+                            Annuler
+                            <span style="font-size: 0.65rem; color: #c0534a;" id="timer-{{ t.id }}"></span>
+                        </a>
+                    {% else %}
+                        <span style="color: var(--gray-light); font-size: 0.72rem;">—</span>
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+<div class="alert alert-info" style="display: flex; align-items: center; gap: 10px;">
+    <i class="fas fa-info-circle" style="font-size: 16px;"></i>
+    <span>Aucune transaction trouvée
+        {% if filtre_type or filtre_compte or filtre_debut or filtre_fin %}
+            pour ces critères. <a href="{% url 'historique' %}" style="color: var(--champ-dark);">Réinitialiser les filtres →</a>
+        {% endif %}
+    </span>
+</div>
+{% endif %}
+
+<script>
+// ── Raccourcis période ──────────────────────────────────────────
+function setRapide(jours) {
+    var today = new Date();
+    var debut = new Date();
+    debut.setDate(debut.getDate() - jours);
+    var fmt = function(d) {
+        return d.getFullYear() + '-' +
+               String(d.getMonth()+1).padStart(2,'0') + '-' +
+               String(d.getDate()).padStart(2,'0');
+    };
+    document.querySelector('[name="date_debut"]').value = fmt(debut);
+    document.querySelector('[name="date_fin"]').value   = fmt(today);
+    document.getElementById('filtreForm').submit();
+}
+
+// ── Comptes à rebours sur les boutons Annuler ───────────────────
+{% for t in transactions %}
+{% if t.peut_annuler %}
+(function() {
+    var secondes = {{ t.secondes_avant_expiration }};
+    var el = document.getElementById('timer-{{ t.id }}');
+    if (!el) return;
+
+    function tick() {
+        if (secondes <= 0) {
+            // Recharger la page pour mettre à jour le bouton
+            window.location.reload();
+            return;
+        }
+        var m = Math.floor(secondes / 60);
+        var s = secondes % 60;
+        el.textContent = '(' + (m > 0 ? m + 'm' + (s < 10 ? '0'+s : s) + 's' : s + 's') + ')';
+        if (secondes <= 60) el.style.color = '#a93226';
+        secondes--;
+        setTimeout(tick, 1000);
+    }
+    tick();
+})();
+{% endif %}
+{% endfor %}
+</script>
+
+{% endblock %}

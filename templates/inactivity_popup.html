@@ -1,0 +1,240 @@
+{% if request.user.is_authenticated %}
+<!-- ═══════════════════════════════════════════════════════════════
+     POPUP DÉCONNEXION AUTOMATIQUE
+     Session Django = 1800s (30 min). Popup apparaît à 25 min.
+════════════════════════════════════════════════════════════════ -->
+
+<div id="inactivity-overlay" style="
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(29, 36, 50, 0.75);
+    z-index: 999998;
+    backdrop-filter: blur(3px);
+"></div>
+
+<div id="inactivity-popup" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999999;
+    width: 100%;
+    max-width: 400px;
+    padding: 0 1rem;
+">
+    <div style="
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    ">
+        <!-- En-tête -->
+        <div style="
+            background: #2d3748;
+            border-bottom: 2px solid #d4a843;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        ">
+            <div style="
+                width: 36px; height: 36px; border-radius: 50%;
+                background: rgba(212,168,67,0.18);
+                display: flex; align-items: center; justify-content: center;
+                flex-shrink: 0;
+            ">
+                <i class="fas fa-clock" style="color: #d4a843; font-size: 15px;"></i>
+            </div>
+            <span style="
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #fff;
+                letter-spacing: 0.04em;
+            ">Session sur le point d'expirer</span>
+        </div>
+
+        <!-- Corps -->
+        <div style="padding: 1.75rem 1.5rem; text-align: center;">
+            <p style="font-size: 0.9rem; color: #4a5568; margin-bottom: 0.5rem; line-height: 1.6;">
+                Vous allez être déconnecté pour inactivité dans
+            </p>
+
+            <!-- Countdown -->
+            <div style="
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 3rem;
+                font-weight: 700;
+                color: #2d3748;
+                letter-spacing: 0.05em;
+                line-height: 1;
+                margin-bottom: 0.75rem;
+            ">
+                <span id="popup-mm">05</span>:<span id="popup-ss">00</span>
+            </div>
+
+            <!-- Barre de progression -->
+            <div style="
+                background: #e2e0db;
+                border-radius: 99px;
+                height: 4px;
+                overflow: hidden;
+                margin-bottom: 1.5rem;
+            ">
+                <div id="popup-progress" style="
+                    height: 4px;
+                    background: #d4a843;
+                    border-radius: 99px;
+                    width: 100%;
+                    transition: width 1s linear;
+                "></div>
+            </div>
+
+            <p style="font-size: 0.78rem; color: #9a9591; margin-bottom: 1.5rem;">
+                Cliquez sur le bouton ci-dessous pour rester connecté.
+            </p>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="resterConnecte()" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 0.65rem 1.4rem;
+                    background: #2d3748;
+                    border: 1.5px solid #d4a843;
+                    border-radius: 6px;
+                    color: #fff;
+                    font-size: 0.82rem;
+                    font-weight: 500;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                " onmouseover="this.style.background='#d4a843'; this.style.color='#1a1a1a';"
+                   onmouseout="this.style.background='#2d3748'; this.style.color='#fff';">
+                    <i class="fas fa-check" style="font-size: 11px;"></i>
+                    Je suis toujours là
+                </button>
+                <a href="{% url 'deconnexion' %}" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 0.65rem 1.4rem;
+                    background: transparent;
+                    border: 1.5px solid #e2e0db;
+                    border-radius: 6px;
+                    color: #9a9591;
+                    font-size: 0.82rem;
+                    font-weight: 500;
+                    letter-spacing: 0.06em;
+                    text-transform: uppercase;
+                    text-decoration: none;
+                    transition: all 0.2s;
+                ">
+                    <i class="fas fa-sign-out-alt" style="font-size: 11px;"></i>
+                    Me déconnecter
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var SESSION_DUREE  = 1800;  // 30 min en secondes (doit correspondre à SESSION_COOKIE_AGE)
+    var POPUP_AVANT    = 300;   // afficher le popup 5 min avant expiration
+    var tempsRestant   = SESSION_DUREE;
+    var popupActif     = false;
+    var countdownRestant = POPUP_AVANT;
+    var countdownTimer = null;
+    var sessionTimer   = null;
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function afficherPopup() {
+        popupActif = true;
+        countdownRestant = POPUP_AVANT;
+        document.getElementById('inactivity-overlay').style.display = 'block';
+        document.getElementById('inactivity-popup').style.display  = 'block';
+        lancerCountdown();
+    }
+
+    function cacherPopup() {
+        popupActif = false;
+        document.getElementById('inactivity-overlay').style.display = 'none';
+        document.getElementById('inactivity-popup').style.display  = 'none';
+        if (countdownTimer) clearInterval(countdownTimer);
+    }
+
+    function lancerCountdown() {
+        if (countdownTimer) clearInterval(countdownTimer);
+        countdownTimer = setInterval(function() {
+            countdownRestant--;
+            var m = Math.floor(countdownRestant / 60);
+            var s = countdownRestant % 60;
+            document.getElementById('popup-mm').textContent = pad(m);
+            document.getElementById('popup-ss').textContent = pad(s);
+            document.getElementById('popup-progress').style.width =
+                (countdownRestant / POPUP_AVANT * 100) + '%';
+
+            // Passer en rouge dans la dernière minute
+            if (countdownRestant <= 60) {
+                document.getElementById('popup-progress').style.background = '#a93226';
+                document.getElementById('popup-mm').parentElement.style.color = '#a93226';
+            }
+
+            if (countdownRestant <= 0) {
+                clearInterval(countdownTimer);
+                // Déconnecter automatiquement
+                window.location.href = "{% url 'deconnexion' %}";
+            }
+        }, 1000);
+    }
+
+    function resetTimer() {
+        if (popupActif) return; // ne pas reset si popup déjà affiché
+        tempsRestant = SESSION_DUREE;
+    }
+
+    function demarrerTimer() {
+        sessionTimer = setInterval(function() {
+            tempsRestant--;
+            if (tempsRestant <= POPUP_AVANT && !popupActif) {
+                afficherPopup();
+            }
+            if (tempsRestant <= 0) {
+                clearInterval(sessionTimer);
+            }
+        }, 1000);
+    }
+
+    // Exposer la fonction au bouton HTML
+    window.resterConnecte = function() {
+        // Appel AJAX pour rafraîchir la session côté serveur
+        fetch("{% url 'refresh_session' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '',
+                'Content-Type': 'application/json',
+            },
+        }).then(function() {
+            tempsRestant = SESSION_DUREE;
+            cacherPopup();
+        }).catch(function() {
+            // En cas d'erreur réseau, on cache quand même le popup
+            tempsRestant = SESSION_DUREE;
+            cacherPopup();
+        });
+    };
+
+    // Réinitialiser sur toute activité utilisateur
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function(evt) {
+        document.addEventListener(evt, resetTimer, { passive: true });
+    });
+
+    demarrerTimer();
+})();
+</script>
+{% endif %}

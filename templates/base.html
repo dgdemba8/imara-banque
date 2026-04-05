@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>¨
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme Bancaire</title>
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1.1">
+
+    <style>
+        body {
+            min-height: 100vh;
+            background-image:
+                linear-gradient(
+                    135deg,
+                    rgba(45, 55, 72, 0.82) 0%,
+                    rgba(29, 36, 50, 0.88) 50%,
+                    rgba(45, 55, 72, 0.82) 100%
+                ),
+                url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+{% include 'inactivity_popup.html' %}
+<body>
+    {% include 'header.html' %}
+
+    <main class="container mb-5" style="padding-top: 82px;">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include 'footer.html' %}
+
+    <script src="{% static 'js/jquery-3.5.1.slim.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

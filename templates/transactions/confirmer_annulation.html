@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center; display: flex;">
+  <div class="col-md-5 col-lg-4">
+
+    <div class="card" style="border-top: 3px solid #a93226 !important; overflow: hidden;">
+
+      <div class="card-header bg-primary" style="border-left: 4px solid var(--champagne) !important; padding: 1.25rem 1.5rem;">
+        <h5 class="mb-0" style="color: #fff;">
+          <i class="fas fa-undo me-2" style="color: var(--champagne);"></i>
+          Annuler le virement
+        </h5>
+      </div>
+
+      <div class="card-body" style="padding: 2rem; text-align: center;">
+
+        <!-- Icône alerte -->
+        <div style="width: 60px; height: 60px; border-radius: 50%; background: #fdf0ef; border: 2px solid #f0b8b3; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 24px; color: #a93226;"></i>
+        </div>
+
+        <h5 style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; margin-bottom: 0.5rem;">
+          Confirmer l'annulation
+        </h5>
+        <p style="font-size: 0.85rem; color: var(--gray-mid); margin-bottom: 1.75rem; line-height: 1.6;">
+          Êtes-vous sûr de vouloir annuler ce virement ?<br>
+          Les fonds seront restitués immédiatement.
+        </p>
+
+        <!-- Détails de la transaction -->
+        <div style="background: var(--off-white); border: 1px solid var(--gray-light); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; text-align: left;">
+          <table style="width: 100%; font-size: 0.85rem;">
+            <tr style="border-bottom: 1px solid var(--gray-light);">
+              <td style="padding: 0.5rem 0; color: var(--gray-mid); width: 45%;">Montant</td>
+              <td style="padding: 0.5rem 0; font-weight: 600; color: var(--black); font-family: 'Cormorant Garamond', serif; font-size: 1.1rem;">
+                {{ transaction.montant|floatformat:0 }} FCFA
+              </td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--gray-light);">
+              <td style="padding: 0.5rem 0; color: var(--gray-mid);">Compte source</td>
+              <td style="padding: 0.5rem 0; color: var(--black);">{{ transaction.compte_source.numero_compte }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--gray-light);">
+              <td style="padding: 0.5rem 0; color: var(--gray-mid);">Destinataire</td>
+              <td style="padding: 0.5rem 0; color: var(--black);">{{ transaction.compte_destination.numero_compte }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--gray-light);">
+              <td style="padding: 0.5rem 0; color: var(--gray-mid);">Date</td>
+              <td style="padding: 0.5rem 0; color: var(--black);">{{ transaction.date_transaction|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% if transaction.motif %}
+            <tr>
+              <td style="padding: 0.5rem 0; color: var(--gray-mid);">Motif</td>
+              <td style="padding: 0.5rem 0; color: var(--black);">{{ transaction.motif }}</td>
+            </tr>
+            {% endif %}
+          </table>
+        </div>
+
+        <!-- Compte à rebours -->
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 1.75rem;">
+          <i class="fas fa-clock" style="font-size: 12px; color: var(--champagne);"></i>
+          <span style="font-size: 0.78rem; color: var(--gray-mid);">
+            Temps restant pour annuler :
+            <strong style="color: var(--champ-dark);" id="countdown">{{ transaction.secondes_avant_expiration }}s</strong>
+          </span>
+        </div>
+
+        <!-- Boutons -->
+        <form method="post">
+          {% csrf_token %}
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <a href="{% url 'historique' %}"
+              style="display: inline-flex; align-items: center; gap: 6px; padding: 0.55rem 1.2rem; background: transparent; border: 1.5px solid var(--gray-light); border-radius: var(--radius); color: var(--gray-mid); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; transition: all 0.2s ease;"
+              onmouseover="this.style.borderColor='var(--champagne)'; this.style.color='var(--champagne)'"
+              onmouseout="this.style.borderColor='var(--gray-light)'; this.style.color='var(--gray-mid)'">
+              <i class="fas fa-times" style="font-size: 10px;"></i>
+              Garder
+            </a>
+            <button type="submit" class="btn btn-primary" id="annulerBtn"
+              style="display: inline-flex; align-items: center; gap: 6px; border-color: #a93226 !important; background-color: #a93226 !important;">
+              <i class="fas fa-undo" style="font-size: 10px;"></i>
+              Confirmer l'annulation
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var secondes = parseInt("{{ transaction.secondes_avant_expiration|default:0 }}");
+  var el  = document.getElementById('countdown');
+  var btn = document.getElementById('annulerBtn');
+
+  function tick(){
+    if(secondes <= 0){
+      el.textContent = 'Expiré';
+      el.style.color = '#a93226';
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+      btn.style.cursor  = 'not-allowed';
+      return;
+    }
+    var m = Math.floor(secondes / 60);
+    var s = secondes % 60;
+    el.textContent = m > 0 ? m + 'm ' + (s < 10 ? '0'+s : s) + 's' : s + 's';
+    secondes--;
+    setTimeout(tick, 1000);
+  }
+  tick();
+</script>
+{% endblock %}

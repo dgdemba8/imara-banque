@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center" style="min-height: 80vh; align-items: center; display: flex;">
+  <div class="col-md-5 col-lg-4">
+
+    <div class="card" style="border-top: 3px solid #a93226 !important; border-radius: var(--radius-lg); overflow: hidden;">
+
+      <div class="card-header bg-primary text-white text-center" style="padding: 1.75rem 2rem; border-left: 4px solid var(--champagne) !important;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 0.4rem;">
+          <img src="{% static 'images/logo.png' %}"
+              alt="Thorys Bank"
+              style="width: 64px; height: 64px; object-fit: contain;">
+          <span style="
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            font-style: italic;
+        ">Imara Banque</span>
+        </div>
+        <p class="mb-0" style="font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--champagne);">Espace client sécurisé</p>
+      </div>
+
+      <!-- Corps -->
+      <div class="card-body" style="padding: 2.25rem 2rem 2rem; text-align: center;">
+
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: #fdf0ef; border: 2px solid #f0b8b3; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+          <i class="fas fa-shield-alt" style="font-size: 26px; color: #a93226;"></i>
+        </div>
+
+        <h4 style="font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: var(--black); margin-bottom: 0.4rem;">
+          Accès temporairement bloqué
+        </h4>
+        <p style="font-size: 0.85rem; color: var(--gray-mid); line-height: 1.6; margin-bottom: 1.75rem;">
+          Trop de tentatives échouées pour le compte
+          <strong style="color: var(--slate-dark);">{{ username }}</strong>.<br>
+          Votre accès est suspendu pour protéger votre compte.
+        </p>
+
+        <!-- Compte à rebours -->
+        <div style="background: var(--off-white); border: 1px solid var(--gray-light); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;">
+          <p style="font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-mid); margin-bottom: 0.5rem;">
+            Déblocage dans
+          </p>
+          <div id="timerDisplay" style="font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 700; color: var(--slate-dark); letter-spacing: 0.05em; line-height: 1;">
+            <span id="mm">--</span>:<span id="ss">--</span>
+          </div>
+          <div style="margin-top: 0.75rem; background: var(--gray-light); border-radius: 99px; height: 4px; overflow: hidden;">
+            <div id="progressBar" style="height: 4px; background: var(--champagne); border-radius: 99px; width: 100%; transition: width 1s linear;"></div>
+          </div>
+        </div>
+
+        <!-- Avertissement -->
+        <div style="display: flex; align-items: flex-start; gap: 8px; background: #fdf8ec; border-left: 3px solid var(--champagne); border-radius: 0 6px 6px 0; padding: 0.75rem 1rem; margin-bottom: 1.75rem; text-align: left;">
+          <i class="fas fa-exclamation-circle" style="font-size: 13px; color: var(--champ-dark); flex-shrink: 0; margin-top: 2px;"></i>
+          <span style="font-size: 0.8rem; color: var(--champ-dark); line-height: 1.5;">
+            Si vous n'êtes pas à l'origine de ces tentatives, contactez votre conseiller bancaire immédiatement.
+          </span>
+        </div>
+
+        <!-- Bouton retour -->
+        <a href="{% url 'etape1_username' %}" id="retourBtn"
+          style="display: inline-flex; align-items: center; gap: 7px; padding: 0.6rem 1.4rem; background: var(--slate-dark); border: 1.5px solid var(--champagne); border-radius: var(--radius); color: #fff; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; text-decoration: none; pointer-events: none; opacity: 0.4; transition: all 0.25s ease;">
+          <i class="fas fa-arrow-left" style="font-size: 10px;"></i>
+          Réessayer
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var totalSecondes = {{ secondes }};
+  var remaining     = totalSecondes;
+  var btn           = document.getElementById('retourBtn');
+  var progressBar   = document.getElementById('progressBar');
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+  function tick(){
+    if(remaining <= 0){
+      document.getElementById('mm').textContent = '00';
+      document.getElementById('ss').textContent = '00';
+      progressBar.style.width = '0%';
+      btn.style.pointerEvents = 'auto';
+      btn.style.opacity       = '1';
+      window.location.reload();
+      return;
+    }
+    var m = Math.floor(remaining / 60);
+    var s = remaining % 60;
+    document.getElementById('mm').textContent = pad(m);
+    document.getElementById('ss').textContent = pad(s);
+    progressBar.style.width = (remaining / totalSecondes * 100) + '%';
+    remaining--;
+    setTimeout(tick, 1000);
+  }
+
+  tick();
+</script>
+{% endblock %}

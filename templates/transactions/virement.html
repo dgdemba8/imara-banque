@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h2>Virement entre comptes</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Effectuer un virement</h5>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Compte source</label>
+                        <select name="compte_source" class="form-select" required>
+                            <option value="">-- Choisir un compte --</option>
+                            {% for compte in comptes %}
+                            <option value="{{ compte.id }}">
+                                {{ compte.numero_compte }} — {{ compte.solde }} FCFA
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Numéro du compte destinataire</label>
+                        <input type="text" name="numero_destination" class="form-control" placeholder="Ex: SN009876543210" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Montant (FCFA)</label>
+                        <input type="number" name="montant" class="form-control" min="1" placeholder="Ex: 10000" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Motif (optionnel)</label>
+                        <input type="text" name="motif" class="form-control" placeholder="Ex: Loyer mars 2026">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Effectuer le virement</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="row justify-content-center" style="min-height: 80vh; align-items: center; display: flex;">
+<div class="col-md-5 col-lg-4">
+
+    <div class="card" style="border-top: 3px solid var(--champagne) !important; border-radius: var(--radius-lg); overflow: hidden;">
+
+    <!-- En-tête -->
+    <div class="card-header bg-primary text-white text-center" style="padding: 2rem 2rem 1.75rem; border-left: 4px solid var(--champagne) !important;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 0.4rem;">
+        <img src="{% static 'images/logo.png' %}"
+        alt="Thorys Bank"
+        style="width: 62px; height: 62px; object-fit: contain;">
+        <span style="
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            font-style: italic;
+        ">Imara Banque
+        </span>
+        </div>
+        <p class="mb-0" style="font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--champagne);">Espace client sécurisé</p>
+    </div>
+
+    <!-- Corps -->
+    <div class="card-body" style="padding: 2rem 2rem 2.25rem;">
+
+        <!-- Indicateur d'étape -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.75rem;">
+        <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--champagne); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span style="font-size: 0.68rem; font-weight: 500; color: var(--black);">1</span>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--gray-mid); letter-spacing: 0.06em; text-transform: uppercase;">Identification </span>
+        </div>
+
+        {% if erreur %}
+        <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-circle me-2" style="font-size: 13px;"></i>{{ erreur }}
+        </div>
+        {% endif %}
+
+        <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label class="form-label">Nom d'utilisateur</label>
+            <div style="position: relative;">
+            <input
+                type="text"
+                name="username"
+                class="form-control"
+                placeholder="Ex : alpha.diop"
+                style="padding-right: 2.6rem;"
+                required
+                autofocus
+            >
+            <span style="position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--gray-mid); pointer-events: none;">
+                <i class="fas fa-user" style="font-size: 13px;"></i>
+            </span>
+            </div>
+        </div>
+
+        <div class="d-grid" style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>Continuer</span>
+            <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+            </button>
+        </div>
+        </form>
+
+        <hr style="margin: 1.5rem 0;">
+
+        <div style="display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--gray-mid);">
+        <i class="fas fa-shield-alt" style="font-size: 11px;"></i>
+        <span style="font-size: 0.72rem; letter-spacing: 0.04em;">Connexion sécurisée SSL 256 bits</span>
+        </div>
+
+    </div>
+    </div>
+
+</div>
+</div>
+{% endblock %}

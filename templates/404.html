@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page introuvable — Imara Banque</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background-image:
+                linear-gradient(135deg, rgba(45,55,72,0.88) 0%, rgba(29,36,50,0.93) 50%, rgba(45,55,72,0.88) 100%),
+                url('https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Sans', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<div style="text-align: center; padding: 2rem 1rem; max-width: 520px; width: 100%;">
+
+    <!-- Logo + nom -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 2.5rem;">
+        <img src="{% static 'images/logo.png' %}"
+             alt="Imara Banque"
+             style="width: 52px; height: 52px; object-fit: contain;">
+        <span style="
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-style: italic;
+            letter-spacing: 0.08em;
+            color: #fff;
+        ">Imara Banque</span>
+    </div>
+
+    <!-- Card erreur -->
+    <div style="
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    ">
+        <!-- Bandeau -->
+        <div style="
+            background: #2d3748;
+            border-bottom: 2px solid #d4a843;
+            padding: 1.5rem 2rem;
+        ">
+            <div style="
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 5rem;
+                font-weight: 700;
+                color: #d4a843;
+                line-height: 1;
+                letter-spacing: 0.05em;
+            ">404</div>
+            <p style="
+                font-size: 0.7rem;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: rgba(255,255,255,0.6);
+                margin: 0.4rem 0 0;
+            ">Page introuvable</p>
+        </div>
+
+        <!-- Corps -->
+        <div style="padding: 2rem;">
+            <div style="
+                width: 56px; height: 56px;
+                border-radius: 50%;
+                background: #fdf8ec;
+                border: 2px solid #d4a843;
+                display: flex; align-items: center; justify-content: center;
+                margin: 0 auto 1.25rem;
+            ">
+                <i class="fas fa-map-signs" style="font-size: 22px; color: #b8922e;"></i>
+            </div>
+
+            <h5 style="
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.3rem;
+                font-weight: 600;
+                color: #2d3748;
+                margin-bottom: 0.5rem;
+            ">Cette page n'existe pas</h5>
+
+            <p style="font-size: 0.85rem; color: #9a9591; line-height: 1.6; margin-bottom: 1.75rem;">
+                La page que vous recherchez a peut-être été déplacée,<br>
+                supprimée ou n'a jamais existé.
+            </p>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <a href="/"
+                    style="
+                        display: inline-flex; align-items: center; gap: 7px;
+                        padding: 0.6rem 1.4rem;
+                        background: #2d3748;
+                        border: 1.5px solid #d4a843;
+                        border-radius: 6px;
+                        color: #fff;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                        letter-spacing: 0.06em;
+                        text-transform: uppercase;
+                        text-decoration: none;
+                        transition: all 0.2s;
+                    "
+                    onmouseover="this.style.background='#d4a843'; this.style.color='#1a1a1a';"
+                    onmouseout="this.style.background='#2d3748'; this.style.color='#fff';">
+                    <i class="fas fa-home" style="font-size: 11px;"></i>
+                    Accueil
+                </a>
+                <a href="javascript:history.back()"
+                    style="
+                        display: inline-flex; align-items: center; gap: 7px;
+                        padding: 0.6rem 1.4rem;
+                        background: transparent;
+                        border: 1.5px solid #e2e0db;
+                        border-radius: 6px;
+                        color: #9a9591;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                        letter-spacing: 0.06em;
+                        text-transform: uppercase;
+                        text-decoration: none;
+                        transition: all 0.2s;
+                    "
+                    onmouseover="this.style.borderColor='#d4a843'; this.style.color='#b8922e';"
+                    onmouseout="this.style.borderColor='#e2e0db'; this.style.color='#9a9591';">
+                    <i class="fas fa-arrow-left" style="font-size: 11px;"></i>
+                    Retour
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pied -->
+    <p style="font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 1.5rem; letter-spacing: 0.04em;">
+        &copy; 2026 Imara Banque — Tous droits réservés
+    </p>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center; display: flex;">
+  <div class="col-md-5 col-lg-4">
+
+    <div class="card" style="border-top: 3px solid var(--champagne) !important; overflow: hidden;">
+
+      <div class="card-header bg-primary" style="border-left: 4px solid var(--champagne) !important; padding: 1.25rem 1.5rem;">
+        <h5 class="mb-0" style="color: #fff;">
+          <i class="fas fa-sliders-h me-2" style="color: var(--champagne);"></i>
+          Plafond journalier de virement
+        </h5>
+      </div>
+
+      <div class="card-body" style="padding: 2rem;">
+
+        <!-- Compte concerné -->
+        <div style="display: flex; align-items: center; gap: 10px; background: var(--off-white); border: 1px solid var(--gray-light); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1.75rem;">
+          <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(45,55,72,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fas fa-credit-card" style="font-size: 13px; color: var(--slate-dark);"></i>
+          </div>
+          <div>
+            <p style="margin: 0; font-size: 0.68rem; color: var(--gray-mid); letter-spacing: 0.07em; text-transform: uppercase;">Compte</p>
+            <p style="margin: 0; font-size: 0.95rem; font-weight: 500; color: var(--black); font-family: 'Cormorant Garamond', serif;">
+              {{ compte.numero_compte }} — {{ compte.get_type_compte_display }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Plafond actuel -->
+        {% if compte.plafond_virement %}
+        <div class="alert alert-warning" style="margin-bottom: 1.5rem;">
+          <i class="fas fa-info-circle me-2" style="font-size: 13px;"></i>
+          Plafond actuel : <strong>{{ compte.plafond_virement|floatformat:0 }} FCFA / jour</strong>
+        </div>
+        {% else %}
+        <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+          <i class="fas fa-info-circle me-2" style="font-size: 13px;"></i>
+          Aucun plafond défini — virements illimités.
+        </div>
+        {% endif %}
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Nouveau plafond (FCFA / jour)</label>
+            <div style="position: relative;">
+              <input
+                type="number"
+                name="plafond"
+                class="form-control"
+                placeholder="Ex : 500000"
+                min="1"
+                value="{{ compte.plafond_virement|default:'' }}"
+                style="padding-right: 2.6rem;"
+              >
+              <span style="position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--gray-mid); font-size: 0.75rem; font-weight: 500;">FCFA</span>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--gray-mid); margin-top: 0.4rem;">
+              Laisser vide pour supprimer toute limite.
+            </p>
+          </div>
+
+          <div class="d-grid" style="margin-top: 1.5rem; gap: 10px;">
+            <button type="submit" class="btn btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <i class="fas fa-save" style="font-size: 12px;"></i>
+              Enregistrer le plafond
+            </button>
+            <a href="{% url 'solde' %}" style="display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.78rem; color: var(--gray-mid); text-decoration: none; padding: 0.4rem;">
+              <i class="fas fa-arrow-left" style="font-size: 10px;"></i>
+              Retour à mes comptes
+            </a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
